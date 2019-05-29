@@ -14,13 +14,10 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./examples/placeholder.png "Model Visualization"
-[image2]: ./examples/placeholder.png "Grayscaling"
-[image3]: ./examples/placeholder_small.png "Recovery Image"
-[image4]: ./examples/placeholder_small.png "Recovery Image"
-[image5]: ./examples/placeholder_small.png "Recovery Image"
-[image6]: ./examples/placeholder_small.png "Normal Image"
-[image7]: ./examples/placeholder_small.png "Flipped Image"
+[nvidianet]: ./examples/nvidia-architecture.png "Model Visualization"
+[training]: ./examples/training-curves.png "Training"
+[original]: ./examples/original.png "Original training image"
+[flipped]: ./examples/flipped.png "Flipped training image"
 
 ---
 ### Files Submitted & Code Quality
@@ -34,6 +31,7 @@ My project includes the following files:
 * drive.py for driving the car in autonomous mode
 * model.h5 containing a trained convolution neural network 
 * writeup_report.md summarizing the results
+* video.mp4
 
 #### Functional code
 Using the Udacity provided simulator and my drive.py file, the car can be driven 
@@ -100,32 +98,75 @@ without leaving the road.
 #### Final Model Architecture
 
 The final model architecture (network.py, with the nvidia architecture) consisted of the following:
-![alt text][image1]
 
-#### 3. Creation of the Training Set & Training Process
+```
+Layer (type)                 Output Shape              Param #   
+=================================================================
+input_1 (InputLayer)         (None, 160, 320, 3)       0         
+_________________________________________________________________
+cropping2d_1 (Cropping2D)    (None, 90, 320, 3)        0         
+_________________________________________________________________
+lambda_1 (Lambda)            (None, 90, 320, 3)        0         
+_________________________________________________________________
+conv2d_1 (Conv2D)            (None, 43, 158, 24)       1824      
+_________________________________________________________________
+conv2d_2 (Conv2D)            (None, 20, 77, 36)        21636     
+_________________________________________________________________
+conv2d_3 (Conv2D)            (None, 8, 37, 48)         43248     
+_________________________________________________________________
+conv2d_4 (Conv2D)            (None, 6, 35, 64)         27712     
+_________________________________________________________________
+conv2d_5 (Conv2D)            (None, 4, 33, 64)         36928     
+_________________________________________________________________
+flatten_1 (Flatten)          (None, 8448)              0         
+_________________________________________________________________
+dense_1 (Dense)              (None, 100)               844900    
+_________________________________________________________________
+dense_2 (Dense)              (None, 50)                5050      
+_________________________________________________________________
+dense_3 (Dense)              (None, 10)                510       
+_________________________________________________________________
+dense_4 (Dense)              (None, 1)                 11        
+=================================================================
+Total params: 981,819
+Trainable params: 981,819
+Non-trainable params: 0
+```
 
-To capture good driving behavior, I first recorded two laps on track one using center lane driving. Here is an example image of center lane driving:
+It starts with pre-processing: first the Cropping2D layer to remove the sky and the hood, 
+then the Lambda layer to normalize the data.
 
-![alt text][image2]
+Or the original image from Nvidia:
 
-I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to .... These images show what a recovery looks like starting from ... :
-
-![alt text][image3]
-![alt text][image4]
-![alt text][image5]
-
-Then I repeated this process on track two in order to get more data points.
-
-To augment the data sat, I also flipped images and angles thinking that this would ... For example, here is an image that has then been flipped:
-
-![alt text][image6]
-![alt text][image7]
-
-Etc ....
-
-After the collection process, I had X number of data points. I then preprocessed this data by ...
+![Nvidia network][nvidianet]
 
 
-I finally randomly shuffled the data set and put 20% of the data into a validation set. 
 
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was Z as evidenced by ... I used an adam optimizer so that manually training the learning rate wasn't necessary.
+#### Creation of the Training Set
+
+I tried to record my own data, with a couple of laps counter-clockwise, then one lap clockwise.
+I also added some recovery data (when car is near the edge and returns to the center).
+
+In the end, I used the Udacity sample data.
+
+20% of the data were selected to be part of the validation set.
+
+During the construction of the generator, I randomly shuffle the training set.
+I randomly select one of the cameras (left, right or center).
+In case of the left or right cameras being selected, I apply a small correction of 0.2 to the angle.
+In case of the center camera being selected, I flipped the image horizontally 50% of the time.
+
+Here is an image before being flipped:
+![Original][original]
+
+And after being flipped:
+![Flipped][flipped]
+
+I used this training data for training the model. 
+The validation set helped determine if the model was over or under fitting. 
+The ideal number of epochs was around 8 as evidenced by the following graph, where the validation error
+starts incrasing after 8 epochs.
+
+![Training Curves][training] 
+
+I used an adam optimizer so that manually training the learning rate wasn't necessary.

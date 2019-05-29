@@ -18,8 +18,9 @@ train_samples, validation_samples = load_samples(data_folder)
 train_generator = generator(data_folder, train_samples, batch_size=batch_size)
 validation_generator = generator(data_folder, validation_samples, batch_size=batch_size)
 
-# Build the model
+# Build the model and display the summary
 model = build_model('nvidia')
+model.summary()
 
 # Compile and train the model using the generator function
 model.compile(loss='mse', optimizer='adam')
