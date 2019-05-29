@@ -25,75 +25,81 @@ The goals / steps of this project are the following:
 ---
 ### Files Submitted & Code Quality
 
-#### 1. Submission includes all required files and can be used to run the simulator in autonomous mode
+#### Submitted files
 
 My project includes the following files:
+* input_generator.py containing the methods to load the data in the form of a Python generator
+* network.py containing the Keras model architecture
 * model.py containing the script to create and train the model
 * drive.py for driving the car in autonomous mode
 * model.h5 containing a trained convolution neural network 
-* writeup_report.md or writeup_report.pdf summarizing the results
+* writeup_report.md summarizing the results
 
-#### 2. Submission includes functional code
-Using the Udacity provided simulator and my drive.py file, the car can be driven autonomously around the track by executing 
+#### Functional code
+Using the Udacity provided simulator and my drive.py file, the car can be driven 
+autonomously around the track by executing 
+
 ```sh
 python drive.py model.h5
 ```
 
-#### 3. Submission code is usable and readable
+#### Code is usable and readable
 
-The input_generator.py file contains the code necessary to load the data, and prepare 2 generators, one for training, one for validation.
+The input_generator.py file contains the code necessary to load the data, 
+and prepare 2 generators, one for training, one for validation.
+
+The network.py file builds the Keras model, with all the required layers.
 
 The model.py file contains the code for training and saving the convolution neural network. 
-It shows the pipeline I used for training and validating the model, and it contains comments to explain how the code works.
+It shows the pipeline I used for training and validating the model, 
+and it contains comments to explain how the code works.
+
 
 ### Model Architecture and Training Strategy
 
-#### 1. An appropriate model architecture has been employed
+#### Model architecture
 
-My model consists of a convolution neural network with 3x3 filter sizes and depths between 32 and 128 (model.py lines 18-24) 
+My model is based on the famous [Nvidia model](https://devblogs.nvidia.com/deep-learning-self-driving-cars/), 
+which performs well for end-to-end models.
 
-The model includes RELU layers to introduce nonlinearity (code line 20), and the data is normalized in the model using a Keras lambda layer (code line 18). 
+The model also includes the pre-processing layers to crop the input image, and also to normalize it. 
 
-#### 2. Attempts to reduce overfitting in the model
+#### Reduce overfitting
 
-The model contains dropout layers in order to reduce overfitting (model.py lines 21). 
+To reduce overfitting, I use some augmentation techniques, like horizontal flipping (with a 50% chance).
+I also make use of the side cameras.
 
-The model was trained and validated on different data sets to ensure that the model was not overfitting (code line 10-16). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
 
-#### 3. Model parameter tuning
+#### Model parameter tuning
 
-The model used an adam optimizer, so the learning rate was not tuned manually (model.py line 25).
+The model used an adam optimizer, so the learning rate was not tuned manually.
 
-#### 4. Appropriate training data
 
-Training data was chosen to keep the vehicle driving on the road. I used a combination of center lane driving, recovering from the left and right sides of the road ... 
+#### Appropriate training data
 
-For details about how I created the training data, see the next section. 
+This was the most complex issue in this project.
+The data need to be well balanced between good runs around the track in both directions.
+It also requires some recovery segments, to ensure the vehicle returns to the center when 
+drifting to the side.
+After trying to gather my own data, and I'm not a very good driver, I decided to use the sample data
+provided by Udacity, which were good enough to complete the first track.  
 
 ### Model Architecture and Training Strategy
 
-#### 1. Solution Design Approach
+#### Solution Design Approach
 
-The overall strategy for deriving a model architecture was to ...
+At first, I tried to use an inception model (as can be seen in the network.py file), followed by a 
+series of fully connected layers.
+I thought such a network would be good at recognizing the track features.
+However, it never really performed well, even in straight lines.
 
-My first step was to use a convolution neural network model similar to the ... I thought this model might be appropriate because ...
+After some internet search, I came across the Nvidia model, and decided to give it a try.
+After the first training, BINGO, the vehicle was able to drive autonomously around the track 
+without leaving the road.
 
-In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. I found that my first model had a low mean squared error on the training set but a high mean squared error on the validation set. This implied that the model was overfitting. 
+#### Final Model Architecture
 
-To combat the overfitting, I modified the model so that ...
-
-Then I ... 
-
-The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track... to improve the driving behavior in these cases, I ....
-
-At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
-
-#### 2. Final Model Architecture
-
-The final model architecture (model.py lines 18-24) consisted of a convolution neural network with the following layers and layer sizes ...
-
-Here is a visualization of the architecture (note: visualizing the architecture is optional according to the project rubric)
-
+The final model architecture (network.py, with the nvidia architecture) consisted of the following:
 ![alt text][image1]
 
 #### 3. Creation of the Training Set & Training Process
