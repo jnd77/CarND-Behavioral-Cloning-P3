@@ -150,6 +150,7 @@ I also added some recovery data (when car is near the edge and returns to the ce
 In the end, I used the Udacity sample data.
 
 20% of the data were selected to be part of the validation set.
+80% were kept for the training, amounting to 6,428 records (each record containing 3 images, one per camera).
 
 During the construction of the generator, I randomly shuffle the training set.
 I randomly select one of the cameras (left, right or center).
